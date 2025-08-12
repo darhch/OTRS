@@ -27,11 +27,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # 2) descomprimir archivo OTRS en /opt/otrs
-COPY otrs-6.0.34.tar.bz2 /tmp/otrs.tar.bz2
+COPY otrs-community-edition-6.0.34.tar.bz2 /tmp/otrs-community-edition-6.0.34.tar.bz2
 RUN mkdir -p /opt \
-    && tar -xjf /tmp/otrs.tar.bz2 -C /opt \
-    && mv /opt/otrs-6.0.34 /opt/otrs \
-    && rm /tmp/otrs.tar.bz2
+    && tar -xjf /tmp/otrs-community-edition-6.0.34.tar.bz2 -C /opt \
+    && mv /opt/otrs-community-edition-6.0.34 /opt/otrs \
+    && rm /tmp/otrs-community-edition-6.0.34.tar.bz2
 
 # 3) crear usuario y permisos iniciales
 RUN useradd -r -m -d /opt/otrs -c "OTRS user" otrs \

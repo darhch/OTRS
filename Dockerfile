@@ -26,11 +26,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     postgresql-client \
     && rm -rf /var/lib/apt/lists/*
 
-# 2) descargar OTRS (source) y descomprimir en /opt/otrs
-RUN wget -q https://ftp.otrs.org/pub/otrs/otrs-${OTRS_VERSION}.tar.bz2 -O /tmp/otrs.tar.bz2 \
-    && mkdir -p /opt \
+# 2) descomprimir archivo OTRS en /opt/otrs
+COPY otrs-6.0.34.tar.bz2 /tmp/otrs.tar.bz2
+RUN mkdir -p /opt \
     && tar -xjf /tmp/otrs.tar.bz2 -C /opt \
-    && mv /opt/otrs-${OTRS_VERSION} /opt/otrs \
+    && mv /opt/otrs-6.0.34 /opt/otrs \
     && rm /tmp/otrs.tar.bz2
 
 # 3) crear usuario y permisos iniciales

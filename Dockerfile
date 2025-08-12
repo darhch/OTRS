@@ -26,6 +26,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     postgresql-client \
     && rm -rf /var/lib/apt/lists/*
 
+# Instalacion de BZIP2 para que pueda descomprimir la app
+RUN apt-get update && apt-get install -y bzip2 && rm -rf /var/lib/apt/lists/*
+
 # 2) descomprimir archivo OTRS en /opt/otrs
 COPY otrs-community-edition-6.0.34.tar.bz2 /tmp/otrs-community-edition-6.0.34.tar.bz2
 RUN mkdir -p /opt \

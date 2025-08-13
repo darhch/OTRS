@@ -45,7 +45,6 @@ RUN	chown -R otrs:www-data /opt/otrs
 RUN chmod -R 750 /opt/otrs
 RUN chmod -R 755 /opt/otrs/var/httpd/htdocs
 
-
 # 4) configurar apache (dejamos que entrypoint ajuste el puerto)
 RUN a2enmod perl rewrite headers expires deflate cgid
 

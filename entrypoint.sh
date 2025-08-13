@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # Dockerfile (otrs-render/Dockerfile)
 FROM ubuntu:22.04
 

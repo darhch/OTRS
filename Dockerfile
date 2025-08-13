@@ -41,10 +41,12 @@ RUN mkdir -p /opt \
     && tar -xjf /tmp/otrs-community-edition-6.0.34.tar.bz2 -C /opt \
     && ls -l /opt/otrs-community-edition-6.0.34/var/httpd/ \
     && mv /opt/otrs-community-edition-6.0.34 /opt/otrs \
+    && ls -l /opt/otrs/var/httpd/ \
     && rm /tmp/otrs-community-edition-6.0.34.tar.bz2 \
     && chown -R otrs:www-data /opt/otrs \
     && chmod -R 750 /opt/otrs \
     && chmod -R 755 /opt/otrs/var/httpd/htdocs
+
 	
 
 
@@ -54,11 +56,11 @@ RUN a2enmod perl rewrite headers expires deflate cgid
 RUN echo '<VirtualHost *:80>\n\
     ServerName localhost\n\
    DocumentRoot /opt/otrs/var/httpd/htdocs\n\
-<Directory /opt/otrs/var/httpd/htdocs>\n\
+	<Directory /opt/otrs/var/httpd/htdocs>\n\
     AllowOverride All\n\
     Options +FollowSymLinks\n\
     Require all granted\n\
-</Directory>\n\
+	</Directory>\n\
     ScriptAlias /otrs/ /opt/otrs/bin/cgi-bin/\n\
     <Directory /opt/otrs/bin/cgi-bin>\n\
         AllowOverride All\n\

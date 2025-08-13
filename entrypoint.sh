@@ -1,6 +1,7 @@
 #!/bin/bash
 set -e
-
+chown -R www-data:www-data /opt/otrs/var/httpd
+chmod -R 755 /opt/otrs/var/httpd
 PORT=${PORT:-80}
 
 # Ajustar Apache para escuchar en el puerto dinámico de Render

@@ -40,7 +40,10 @@ RUN mkdir -p /opt \
     && tar -xjf /tmp/otrs-community-edition-6.0.34.tar.bz2 -C /opt \
     && mv /opt/otrs-community-edition-6.0.34 /opt/otrs \
     && rm /tmp/otrs-community-edition-6.0.34.tar.bz2
-RUN chown -R otrs:www-data /opt/otrs && chmod -R 750 /opt/otrs
+
+RUN	chown -R otrs:www-data /opt/otrs
+RUN chmod -R 750 /opt/otrs
+RUN chmod -R 755 /opt/otrs/var/httpd/htdocs
 
 
 # 4) configurar apache (dejamos que entrypoint ajuste el puerto)

@@ -1,41 +1,73 @@
-#!/bin/bash
-set -e
+# Dockerfile (otrs-render/Dockerfile)
+FROM ubuntu:22.04
 
-# Puerto (Render da $PORT)
-PORT=${PORT:-80}
+ENV OTRS_VERSION=6.0.34
+ENV DEBIAN_FRONTEND=noninteractive
+ENV LANG=C.UTF-8
 
-# Ajustar Apache para escuchar en $PORT
-if grep -q "^Listen " /etc/apache2/ports.conf; then
-  sed -ri "s/Listen [0-9]+/Listen ${PORT}/" /etc/apache2/ports.conf
-else
-  echo "Listen ${PORT}" >> /etc/apache2/ports.conf
-fi
+# 1) Instalar dependencias del sistema y módulos Perl comunes
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    apache2 \
+    libapache2-mod-perl2 \
+    wget \
+    unzip \
+    cron \
+    ca-certificates \
+    perl \
+    libdbi-perl \
+    libdbd-pg-perl \
+    libdbd-mysql-perl \
+    libtemplate-perl \
+    libsoap-lite-perl \
+    libarchive-zip-perl \
+    libio-socket-ssl-perl \
+    libauthen-sasl-perl \
+    libgd-perl \
+    libxml-simple-perl \
+    postgresql-client \
+    bzip2 \
+    && rm -rf /var/lib/apt/lists/*
 
-# Crear configuración de OTRS para Apache
-if [ -f /opt/otrs/scripts/apache2-httpd.include.conf ]; then
-  cp /opt/otrs/scripts/apache2-httpd.include.conf /etc/apache2/sites-available/otrs.conf
+# 2) Crear usuario y permisos iniciales
+RUN useradd -r -m -d /opt/otrs -c "OTRS user" otrs \
+    && usermod -a -G www-data otrs \
+    && chown -R otrs:www-data /opt/otrs
 
-  # Ajustar VirtualHost al puerto dinámico
-  sed -ri "s/<VirtualHost \*:80>/<VirtualHost *:${PORT}>/g" /etc/apache2/sites-available/otrs.conf
+# 3) Copiar y descomprimir OTRS (el .tar.bz2 debe estar junto al Dockerfile)
+COPY otrs-community-edition-${OTRS_VERSION}.tar.bz2 /tmp/otrs.tar.bz2
+RUN mkdir -p /opt \
+    && tar -xjf /tmp/otrs.tar.bz2 -C /opt \
+    && mv /opt/otrs-community-edition-${OTRS_VERSION} /opt/otrs \
+    && rm /tmp/otrs.tar.bz2
 
-  # Asegurar que el DocumentRoot esté definido
-  if ! grep -q "DocumentRoot" /etc/apache2/sites-available/otrs.conf; then
-    echo "DocumentRoot /opt/otrs/bin/cgi-bin" >> /etc/apache2/sites-available/otrs.conf
-  fi
+# 4) Configurar Apache (sin puerto fijo, el entrypoint lo ajustará)
+RUN a2enmod perl rewrite headers expires deflate \
+    && echo '<VirtualHost *:80>\n\
+    ServerName localhost\n\
+    DocumentRoot /opt/otrs\n\
+    <Directory /opt/otrs>\n\
+        AllowOverride All\n\
+        Options +ExecCGI\n\
+        AddHandler cgi-script .pl\n\
+        Require all granted\n\
+    </Directory>\n\
+    ScriptAlias /otrs/ /opt/otrs/bin/cgi-bin/\n\
+    <Directory /opt/otrs/bin/cgi-bin>\n\
+        AllowOverride All\n\
+        Options +ExecCGI\n\
+        AddHandler cgi-script .pl\n\
+        Require all granted\n\
+    </Directory>\n\
+</VirtualHost>' > /etc/apache2/sites-available/otrs.conf \
+    && a2ensite otrs.conf \
+    && a2dissite 000-default.conf
 
-  a2ensite otrs || true
-fi
+# 5) Copiar entrypoint y dar permisos
+COPY entrypoint.sh /opt/otrs/entrypoint.sh
+RUN chmod +x /opt/otrs/entrypoint.sh
 
-# Habilitar módulos de Apache
-a2enmod perl cgi rewrite headers expires deflate || true
+# 6) Exponer puerto por defecto (Render usará $PORT en runtime)
+EXPOSE 80
 
-# Configurar permisos
-if [ -f /opt/otrs/bin/otrs.SetPermissions.pl ]; then
-  /opt/otrs/bin/otrs.SetPermissions.pl --web-group=www-data || true
-fi
-
-# Iniciar cron (para trabajos de OTRS)
-service cron start || true
-
-# Arrancar Apache en primer plano
-exec apache2ctl -D FOREGROUND
+# 7) Arrancar entrypoint
+CMD ["/opt/otrs/entrypoint.sh"]

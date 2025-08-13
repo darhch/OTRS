@@ -63,7 +63,8 @@ RUN echo '<VirtualHost *:80>\n\
 
 # 5) copiar entrypoint y dar permisos
 COPY entrypoint.sh /opt/otrs/entrypoint.sh
-RUN chmod +x /opt/otrs/entrypoint.sh
+RUN sed -i 's/\r$//' /opt/otrs/entrypoint.sh && chmod +x /opt/otrs/entrypoint.sh
+
 
 # 6) exponer puerto por defecto
 EXPOSE 80

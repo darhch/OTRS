@@ -2,10 +2,6 @@
 set -e
 
 PORT=${PORT:-80}
-# Definir ServerName para evitar warnings
-if ! grep -q "^ServerName" /etc/apache2/apache2.conf; then
-  echo "ServerName localhost" >> /etc/apache2/apache2.conf
-fi
 
 # Ajustar Apache Listen
 if grep -q "^Listen " /etc/apache2/ports.conf; then
@@ -19,7 +15,12 @@ for f in /etc/apache2/sites-available/*.conf; do
   [ -f "$f" ] && sed -ri "s/<VirtualHost \*:80>/<VirtualHost *:${PORT}>/g" "$f" || true
 done
 
-# Permisos OTRS
+# Evitar warning ServerName
+if ! grep -q "^ServerName" /etc/apache2/apache2.conf; then
+  echo "ServerName localhost" >> /etc/apache2/apache2.conf
+fi
+
+# Establecer permisos OTRS
 if [ -f /opt/otrs/bin/otrs.SetPermissions.pl ]; then
   /opt/otrs/bin/otrs.SetPermissions.pl --web-group=www-data || true
 fi

@@ -53,12 +53,12 @@ RUN a2enmod perl rewrite headers expires deflate cgid
 
 RUN echo '<VirtualHost *:80>\n\
     ServerName localhost\n\
-   DocumentRoot /opt/otrs/var/httpd/htdocs
-<Directory /opt/otrs/var/httpd/htdocs>
-    AllowOverride All
-    Options +FollowSymLinks
-    Require all granted
-</Directory>
+   DocumentRoot /opt/otrs/var/httpd/htdocs\n\
+<Directory /opt/otrs/var/httpd/htdocs>\n\
+    AllowOverride All\n\
+    Options +FollowSymLinks\n\
+    Require all granted\n\
+</Directory>\n\
     ScriptAlias /otrs/ /opt/otrs/bin/cgi-bin/\n\
     <Directory /opt/otrs/bin/cgi-bin>\n\
         AllowOverride All\n\

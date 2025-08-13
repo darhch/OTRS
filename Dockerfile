@@ -39,13 +39,15 @@ COPY otrs-community-edition-6.0.34.tar.bz2 /tmp/otrs-community-edition-6.0.34.ta
 
 RUN mkdir -p /opt \
     && tar -xjf /tmp/otrs-community-edition-6.0.34.tar.bz2 -C /opt \
-    && ls -l /opt/otrs-community-edition-6.0.34/var/httpd/ \
     && mv /opt/otrs-community-edition-6.0.34 /opt/otrs \
-    && ls -l /opt/otrs/var/httpd/ \
-    && rm /tmp/otrs-community-edition-6.0.34.tar.bz2 \
+    && ls -l /opt/otrs/var/httpd/ || true \
+    && rm /tmp/otrs-community-edition-6.0.34.tar.bz2
+
+RUN mkdir -p /opt/otrs/var/httpd/htdocs \
     && chown -R otrs:www-data /opt/otrs \
     && chmod -R 750 /opt/otrs \
-    && chmod -R 755 /opt/otrs/var/httpd/htdocs
+    && chmod -R 755 /opt/otrs/var/httpd/htdocs || true
+
 
 	
 

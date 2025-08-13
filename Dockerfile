@@ -44,15 +44,14 @@ RUN chown -R otrs:www-data /opt/otrs && chmod -R 750 /opt/otrs
 
 
 # 4) configurar apache (dejamos que entrypoint ajuste el puerto)
-RUN a2enmod perl rewrite headers expires deflate
+RUN a2enmod perl rewrite headers expires deflate cgid
 
 RUN echo '<VirtualHost *:80>\n\
     ServerName localhost\n\
-    DocumentRoot /opt/otrs\n\
-    <Directory /opt/otrs>\n\
+    DocumentRoot /opt/otrs/var/httpd/htdocs\n\
+    <Directory /opt/otrs/var/httpd/htdocs>\n\
         AllowOverride All\n\
-        Options +ExecCGI\n\
-        AddHandler cgi-script .pl\n\
+        Options +FollowSymLinks\n\
         Require all granted\n\
     </Directory>\n\
     ScriptAlias /otrs/ /opt/otrs/bin/cgi-bin/\n\

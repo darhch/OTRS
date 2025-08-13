@@ -39,11 +39,9 @@ RUN mkdir -p /opt \
     && mv /opt/otrs-community-edition-6.0.34 /opt/otrs \
     && rm /tmp/otrs.tar.bz2
 
-# 4) configurar apache
+# 4) configurar apache (puerto fijo 80 aquí, se ajusta luego en entrypoint)
 RUN a2enmod perl rewrite headers expires deflate
-
-# Configuración de Apache para OTRS
-RUN echo '<VirtualHost *:${PORT}>\n\
+RUN echo '<VirtualHost *:80>\n\
     ServerName localhost\n\
     DocumentRoot /opt/otrs\n\
     <Directory /opt/otrs>\n\

@@ -3,6 +3,10 @@ set -e
 
 # Si Render proporciona $PORT, úsalo; si no, default 80
 PORT=${PORT:-80}
+# Definir ServerName para evitar warning
+if ! grep -q "^ServerName" /etc/apache2/apache2.conf; then
+  echo "ServerName localhost" >> /etc/apache2/apache2.conf
+fi
 
 # Ajustar Apache para escuchar en $PORT
 if grep -q "^Listen " /etc/apache2/ports.conf; then
